@@ -1,6 +1,6 @@
 // Dependencies
-// const { fstat } = require("fs");
 const fs = require("fs");
+const uuidv1 = require("uuid/v1");
 
 // Routing
 module.exports = function(app) {
@@ -19,20 +19,13 @@ module.exports = function(app) {
     app.post("/api/notes", (req, res) => {
         const newNote = req.body;
         let savedNotes = [];
-        let id = 0;
         
-        fs.readFile(__dirname + "/../db/db.json", "utf8", (err, data) => { // took away "utf8" paramater between dirname and (err,data)
+        fs.readFile(__dirname + "/../db/db.json", "utf8", (err, data) => { 
             if (err) throw err;
 
             savedNotes = JSON.parse(data);
 
-            for (let i = 0; i < savedNotes.length; i++) {
-                if (savedNotes[i].id > id) {
-                    id = savedNotes[i].id;
-                }
-            }
-
-            newNote.id = parseInt(id) + 1;
+            newNote.id = uuidv1();
             savedNotes.push(newNote);
 
             fs.writeFile(__dirname + "/../db/db.json", JSON.stringify(savedNotes), "utf8", err => {
